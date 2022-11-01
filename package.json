@@ -9,9 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.0.5",
+    "@dnd-kit/modifiers": "^6.0.0",
+    "@radix-ui/react-scroll-area": "^1.0.1",
+    "ariakit": "2.0.0-next.41",
     "next": "13.0.0",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "zustand": "^4.1.4"
   },
   "devDependencies": {
     "@types/node": "18.11.7",
