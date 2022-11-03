@@ -19,17 +19,16 @@ import { Word } from "./Word";
 import _words from "../data/words.json";
 import commonWords from "../data/common-words.json";
 import create from "zustand";
+import msgpack from "msgpack-lite";
 
 // shuffle words
 const words = _words.concat(commonWords).sort(() => Math.random() - 0.5);
 
 // Place to store words in use
 const useCanvas = create<{
-  used: { word: string; top: string; left: string }[];
   unused: typeof words;
   active: { word: string; used: boolean } | null;
 }>((set) => ({
-  used: [],
   unused: words,
   active: null,
 }));
@@ -39,13 +38,18 @@ const TIMEOUT_BEFORE_MODAL = 1000;
 function Inner() {
   const { active } = useDndContext();
   const isDragging = active !== null;
-  const used = useCanvas((state) => state.used);
-  const unused = useCanvas((state) => state.unused);
+  // const used = useCanvas((state) => state.used);
+  const { used } = getInfoFromHash();
+  const usedWords = used.map((word) => word.word);
+
+  const unused = useCanvas((state) =>
+    state.unused.filter((w) => !usedWords.includes(w.word))
+  );
 
   return (
     <main className="page-main">
       <section className="words">
-        <p className="suggestion">Press and hold to see a word’s origin</p>
+        <p className="suggestion">Press and hold to see a word&apos;s origin</p>
         <ScrollArea.Root asChild>
           <div
             className="word-list__outer"
@@ -89,7 +93,7 @@ function Inner() {
           ))}
         </Canvas>
         <div className="share-btns">
-          <button className="share-btn">Copy URL</button>
+          <button className="share-btn">Copy Share URL</button>
           <button className="share-btn twitter" aria-label="Tweet">
             <Twitter />
           </button>
@@ -176,63 +180,121 @@ export function Main() {
       modalTimeout.current = null;
     }
 
-    const word = event.active.data.current?.word;
-    const used = event.active.data.current?.used;
+    const word = event.active.data.current?.word as string;
+    const used = event.active.data.current?.used as boolean;
 
+    // word not dropped on canvas
     if (event.over === null) {
       if (used) {
-        let baseWord = words.find((w) => w.word === word);
-
-        // remove from canvas
-        useCanvas.setState((state) => {
-          if (!baseWord) return state;
-          return {
-            used: state.used.filter((w) => w.word !== word),
-            unused: [...state.unused, baseWord],
-          };
-        });
+        // remove word from url bar
+        removeWordFromHash(word);
       }
       return;
     }
     const canvas = event.over?.rect;
     const wordRect = event.active.rect.current.translated;
 
+    // problem getting word
     if (!wordRect) return;
 
+    // get top and left as percentage of canvas position
     const top =
       ((100 * (wordRect.top - canvas.top)) / canvas.height).toFixed(2) + "%";
     const left =
       ((100 * (wordRect.left - canvas.left)) / canvas.width).toFixed(2) + "%";
 
+    // word was already on canvas so we're just moving it
     if (used) {
-      useCanvas.setState((state) => {
-        return {
-          used: state.used.map((w) => {
-            if (w.word === word) {
-              return {
-                ...w,
-                top,
-                left,
-              };
-            }
-            return w;
-          }),
-          active: null,
-        };
-      });
+      updateWordInHash(word, top, left);
+      // useCanvas.setState((state) => {
+      //   return {
+      //     used: state.used.map((w) => {
+      //       if (w.word === word) {
+      //         return {
+      //           ...w,
+      //           top,
+      //           left,
+      //         };
+      //       }
+      //       return w;
+      //     }),
+      //     active: null,
+      //   };
+      // });
     } else {
-      useCanvas.setState((state) => ({
-        used: [
-          ...state.used,
-          {
-            word: event.active.data.current?.word,
-            top,
-            left,
-          },
-        ],
-        unused: state.unused.filter((w) => w.word !== word),
-        active: null,
-      }));
+      // word was not on canvas so we're adding it
+      addWordToHash(word, top, left);
+
+      // useCanvas.setState((state) => ({
+      //   used: [
+      //     ...state.used,
+      //     {
+      //       word: event.active.data.current?.word,
+      //       top,
+      //       left,
+      //     },
+      //   ],
+      //   unused: state.unused.filter((w) => w.word !== word),
+      //   active: null,
+      // }));
     }
   }
+}
+
+type Info = {
+  used: { word: string; top: string; left: string }[];
+};
+
+function setInfoToHash(info: Info) {
+  // encode info with hex
+  const hash = Buffer.from(msgpack.encode(info)).toString("base64");
+  window.location.hash = hash;
+}
+
+function getInfoFromHash(): Info {
+  const hash = window.location.hash.slice(1);
+  if (!hash)
+    return {
+      used: [],
+    };
+
+  try {
+    const info = msgpack.decode(Buffer.from(hash, "base64"));
+    if (!Array.isArray(info.used)) {
+      throw new Error("Invalid hash");
+    }
+    return info;
+  } catch (err) {
+    console.error(err);
+  }
+  return {
+    used: [],
+  };
+}
+
+function addWordToHash(word: string, top: string, left: string) {
+  const info = getInfoFromHash();
+  info.used.push({ word, top, left });
+  setInfoToHash(info);
+}
+
+function removeWordFromHash(word: string) {
+  const info = getInfoFromHash();
+  info.used = info.used.filter((w) => w.word !== word);
+  setInfoToHash(info);
+}
+
+function updateWordInHash(word: string, top: string, left: string) {
+  const info = getInfoFromHash();
+  info.used = info.used.map((w) => {
+    if (w.word === word) {
+      return {
+        word,
+        top,
+        left,
+      };
+    }
+    return w;
+  });
+  setInfoToHash(info);
 }

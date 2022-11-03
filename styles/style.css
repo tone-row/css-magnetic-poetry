@@ -13,6 +13,8 @@
   --canvasHeight: 315px;
   --containerWidth: 1067px;
   --footerHeight: 59px;
+
+  --dynamicCanvasWidth: min(600px, 100vw - (2 * var(--hPaddingPage)));
 }
 
 @font-face {
@@ -46,7 +48,7 @@ body {
 }
 
 body {
-  min-height: 100vh;
+  /* min-height: 100vh; */
   display: grid;
   grid-template-rows: minmax(0, 1fr) var(--footerHeight);
 }
@@ -61,6 +63,7 @@ footer {
   text-align: center;
   border-top: 1px solid #a3a3a3;
   font-size: 14px;
+  background-color: white;
 }
 
 footer .suggestion {
@@ -72,12 +75,21 @@ footer .suggestion {
   max-width: 100vw;
   width: var(--containerWidth);
   margin: 0 auto;
-  height: calc(100vh - var(--footerHeight));
+}
+
+@media (min-height: 813px) {
+  .container {
+    height: calc(100vh - var(--footerHeight));
+  }
 }
 
 section {
   display: grid;
   gap: 7px;
+}
+
+section.canvas {
+  justify-self: start;
 }
 
 header {
@@ -115,15 +127,20 @@ h1 {
 }
 
 .word {
+  --fs: var(--dynamicCanvasWidth) * 18 / 600;
+  --lh: var(--fs) * (20 / 18);
+  --pt: var(--fs) * (5 / 18);
+  --pr: var(--fs) * (9 / 18);
+  --pb: var(--fs) * (6 / 18);
+  --pl: var(--fs) * (7 / 18);
+  padding: calc(var(--pt)) calc(var(--pr)) calc(var(--pb)) calc(var(--pl));
+  font-size: calc(var(--fs));
+  line-height: calc(var(--lh));
   font-family: Georgia, "Times New Roman", Times, serif;
-  font-size: 18px;
-  padding: 5px 9px 6px 7px;
   background: #ffffff;
   border: 1px solid #000000;
   box-shadow: 0px 3px 1px rgba(0, 0, 0, 0.19);
   font-weight: 400;
-  font-size: 18px;
-  line-height: 20px;
   color: #000000;
   cursor: grab;
 }
@@ -156,7 +173,7 @@ h1 {
 .word-list__inner {
   display: flex;
   flex-wrap: wrap;
-  justify-content: start;
+  justify-content: flex-start;
   margin: 0 auto;
   max-height: 300px;
   gap: 10px;
@@ -177,13 +194,12 @@ h1 {
   box-shadow: none;
 }
 .canvas__canvas {
-  width: 100%;
+  width: calc(var(--dynamicCanvasWidth));
   /* height: 315px; */
   aspect-ratio: 1.904762;
-  max-width: 600px;
+  max-width: var(--canvasWidth);
   border: 1px solid #a3a3a3;
   position: relative;
-  background: var(--color-blue-dark);
 }
 
 .canvas__canvas.over {
@@ -261,6 +277,17 @@ section.words {
 /* Two Column Layout */
 
 @media (min-width: 768px) {
+  :root {
+    --dynamicCanvasWidth: min(
+      600px,
+      (3 / 5) * (min(100vw, var(--containerWidth))) - 2 * var(--hPaddingPage)
+    );
+  }
+
+  section.canvas {
+    justify-self: stretch;
+  }
+
   .container {
     display: grid;
     grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
