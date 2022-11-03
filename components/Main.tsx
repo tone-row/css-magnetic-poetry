@@ -252,6 +252,7 @@ function setInfoToHash(info: Info) {
 }
 
 function getInfoFromHash(): Info {
+  if (typeof window === "undefined") return { used: [] };
   const hash = window.location.hash.slice(1);
   if (!hash)
     return {
