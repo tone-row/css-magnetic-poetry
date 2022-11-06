@@ -16,13 +16,10 @@ import { Canvas } from "./Canvas";
 import { DownArrow } from "./DownArrow";
 import { Twitter } from "./Twitter";
 import { Word } from "./Word";
-import _words from "../data/words.json";
-import commonWords from "../data/common-words.json";
 import create from "zustand";
 import msgpack from "msgpack-lite";
-
 // shuffle words
-const words = _words.concat(commonWords).sort(() => Math.random() - 0.5);
+import { words } from "./words";
 
 // Place to store words in use
 const useCanvas = create<{
@@ -39,9 +36,9 @@ function Inner() {
   const { active } = useDndContext();
   const isDragging = active !== null;
   // const used = useCanvas((state) => state.used);
-  const { used } = getInfoFromHash();
+  const { used, bg } = getInfoFromHash();
   const usedWords = used.map((word) => word.word);
-
+  const [_, rerender] = useState(0);
   const unused = useCanvas((state) =>
     state.unused.filter((w) => !usedWords.includes(w.word))
   );
@@ -87,11 +84,19 @@ function Inner() {
           <DownArrow />
           <span>drag words onto the canvas to compose poem</span>
         </p>
-        <Canvas>
+        <Canvas style={{ background: bg }}>
           {used.map(({ word, top, left }) => (
             <Word word={word} used={true} key={word} style={{ top, left }} />
           ))}
         </Canvas>
+        <input
+          type="text"
+          defaultValue={bg}
+          onBlur={(e) => {
+            updateBgInHash(e.target.value);
+            rerender((x) => x + 1);
+          }}
+        />
         <div className="share-btns">
           <button className="share-btn">Copy Share URL</button>
           <button className="share-btn twitter" aria-label="Tweet">
@@ -206,43 +211,18 @@ export function Main() {
     // word was already on canvas so we're just moving it
     if (used) {
       updateWordInHash(word, top, left);
-      // useCanvas.setState((state) => {
-      //   return {
-      //     used: state.used.map((w) => {
-      //       if (w.word === word) {
-      //         return {
-      //           ...w,
-      //           top,
-      //           left,
-      //         };
-      //       }
-      //       return w;
-      //     }),
-      //     active: null,
-      //   };
-      // });
+      // you might need to set active null
     } else {
       // word was not on canvas so we're adding it
       addWordToHash(word, top, left);
-
-      // useCanvas.setState((state) => ({
-      //   used: [
-      //     ...state.used,
-      //     {
-      //       word: event.active.data.current?.word,
-      //       top,
-      //       left,
-      //     },
-      //   ],
-      //   unused: state.unused.filter((w) => w.word !== word),
-      //   active: null,
-      // }));
+      // you might need to set active null
     }
   }
 }
 
 type Info = {
   used: { word: string; top: string; left: string }[];
+  bg: string;
 };
 
 function setInfoToHash(info: Info) {
@@ -252,11 +232,12 @@ function setInfoToHash(info: Info) {
 }
 
 function getInfoFromHash(): Info {
-  if (typeof window === "undefined") return { used: [] };
+  if (typeof window === "undefined") return { used: [], bg: "" };
   const hash = window.location.hash.slice(1);
   if (!hash)
     return {
       used: [],
+      bg: "",
     };
 
   try {
@@ -270,6 +251,7 @@ function getInfoFromHash(): Info {
   }
   return {
     used: [],
+    bg: "",
   };
 }
 
@@ -297,5 +279,11 @@ function updateWordInHash(word: string, top: string, left: string) {
     }
     return w;
   });
+  setInfoToHash(info);
+}
+
+function updateBgInHash(bg: string) {
+  const info = getInfoFromHash();
+  info.bg = bg;
   setInfoToHash(info);
 }

@@ -1,12 +1,12 @@
 const SIZE = 500;
-
+const AMOUNT = 14;
 export function Squigglies() {
   return (
     <div className="squigglies">
       <svg width="100%" height="100%">
-        {Array.from({ length: 10 }).map((_, i) => {
+        {Array.from({ length: 100 }).map((_, i) => {
           const x = Math.random() * SIZE - SIZE / 2;
-          const y = (i * SIZE) / 4;
+          const y = (i * SIZE) / AMOUNT;
           return (
             <path
               key={i}
