@@ -12,7 +12,6 @@
   --canvasWidth: 600px;
   --canvasHeight: 315px;
   --containerWidth: 1067px;
-  --footerHeight: 59px;
 
   --dynamicCanvasWidth: min(600px, 100vw - (2 * var(--hPaddingPage)));
 }
@@ -28,7 +27,7 @@
   font-family: "JetBrains Mono";
   font-style: italic;
   font-weight: 300;
-  src: url("/fonts/JetBrainsMono-LightItalic") format("woff2");
+  src: url("/fonts/JetBrainsMono-LightItalic.woff2") format("woff2");
 }
 
 @font-face {
@@ -48,33 +47,12 @@ html {
 }
 
 body {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) var(--footerHeight);
   overflow-x: hidden;
-  align-content: start;
   min-height: 100vh;
 }
 
 strong {
   font-weight: 800;
-}
-
-footer {
-  display: grid;
-  grid-auto-flow: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  padding: 17px 20px;
-  text-align: center;
-  border-top: 1px solid #a3a3a3;
-  font-size: 14px;
-  background-color: white;
-}
-
-footer .suggestion {
-  line-height: 1;
-  margin-top: 1px;
 }
 
 .container {
@@ -85,7 +63,7 @@ footer .suggestion {
 
 @media (min-height: 813px) and (min-width: 768px) {
   .container {
-    height: calc(100vh - var(--footerHeight));
+    height: 100vh;
   }
 }
 
@@ -103,6 +81,11 @@ header {
   display: grid;
   gap: 10px;
   align-content: start;
+}
+
+header a {
+  text-decoration: underline;
+  color: inherit;
 }
 
 header,
@@ -146,7 +129,8 @@ h1 {
   font-family: Georgia, "Times New Roman", Times, serif;
   background: #ffffff;
   border: 1px solid #000000;
-  box-shadow: 0px 3px 1px rgba(0, 0, 0, 0.19);
+  border-radius: 2px;
+  box-shadow: 0px 2px 1px rgba(0, 0, 0, 0.19);
   font-weight: 400;
   color: #000000;
   cursor: grab;
@@ -192,7 +176,7 @@ h1 {
 }
 
 .word-list__inner .word:hover {
-  box-shadow: 0px 3px 1px rgba(0, 0, 0, 0.39);
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
 }
 
 .word-list__inner [aria-pressed="true"] .word {

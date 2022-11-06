@@ -1,7 +1,5 @@
 import "../styles/style.css";
 
-import { Smiley } from "../components/Smiley";
-
 export default function RootLayout({
   children,
 }: {
@@ -16,11 +14,6 @@ export default function RootLayout({
       </head>
       <body>
         <div className="page">{children}</div>
-        <footer>
-          <Smiley />
-          <span>Made by Tone Row</span>
-          <span className="suggestion follow-us">Follow Us!</span>
-        </footer>
       </body>
     </html>
   );

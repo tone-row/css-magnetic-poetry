@@ -14,7 +14,10 @@ export default function Page() {
         <p>
           <strong>I love CSS!</strong> Sometimes it gets a bad rap. I wanted to
           build something which serves no purpose other than showing my
-          appreciation for the language and the work of the people who make it
+          appreciation for the language and the work of the{" "}
+          <a href="https://www.w3.org/Style/CSS/members.en.php3#members">
+            people who make it
+          </a>{" "}
           what it is today.
         </p>
         <p>
