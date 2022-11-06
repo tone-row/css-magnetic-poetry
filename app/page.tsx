@@ -1,4 +1,5 @@
 import { Main } from "../components/Main";
+import { Smiley } from "../components/Smiley";
 import { Squigglies } from "../components/Squigglies";
 export default function Page() {
   return (
@@ -12,26 +13,34 @@ export default function Page() {
           <em>What&apos;s all this about?</em>
         </h3>
         <p>
-          <strong>I love CSS!</strong> Sometimes it gets a bad rap. I wanted to
-          build something which serves no purpose other than showing my
-          appreciation for the language and the work of the{" "}
+          <strong>I love CSS!</strong> I wanted to build something for no other
+          purpose than showing my appreciation for the language and the work of
+          the{" "}
           <a href="https://www.w3.org/Style/CSS/members.en.php3#members">
             people who make it
-          </a>{" "}
-          what it is today.
+          </a>
+          .
         </p>
         <p>
           <strong>Please enjoy this app!</strong> It&apos;s built with Next 13
-          with special attention for the new Open Graph Image library, so if you
-          share your poem with the world it should appear exactly as you see it
-          here.
+          and makes use of the new Open Graph Image library, so if you share
+          your poem with the world it should appear exactly as you see it here
+          🌎 👀
         </p>
         <p>
-          <a href="https://twitter.com/tone_row_">Made by Tone Row</a>
+          <a
+            href="https://twitter.com/tone_row_"
+            className="sidebar-icon-link tone-row"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <Smiley />
+            Made by Tone Row
+          </a>
         </p>
         <p>
           <a href="https://github.com/tone-row/css-magnetic-poetry">
-            View on Github
+            View Source
           </a>
         </p>
         {/* <Squigglies /> */}

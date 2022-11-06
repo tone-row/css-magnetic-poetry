@@ -25,7 +25,7 @@ import { words } from "./words";
 const useCanvas = create<{
   unused: typeof words;
   active: { word: string; used: boolean } | null;
-}>((set) => ({
+}>(() => ({
   unused: words,
   active: null,
 }));
@@ -42,6 +42,8 @@ function Inner() {
   const unused = useCanvas((state) =>
     state.unused.filter((w) => !usedWords.includes(w.word))
   );
+
+  console.log(getInfoFromSearchParams());
 
   return (
     <main className="page-main">
@@ -89,20 +91,24 @@ function Inner() {
             <Word word={word} used={true} key={word} style={{ top, left }} />
           ))}
         </Canvas>
-        <input
-          type="text"
-          defaultValue={bg}
-          onBlur={(e) => {
-            updateBgInHash(e.target.value);
-            rerender((x) => x + 1);
-          }}
-        />
-        <div className="share-btns">
-          <button className="share-btn">Copy Share URL</button>
-          <button className="share-btn twitter" aria-label="Tweet">
-            <Twitter />
-          </button>
+        <div className="input-with-label">
+          <label htmlFor="background">Background</label>
+          <input
+            type="text"
+            id="background"
+            defaultValue={bg}
+            onBlur={(e) => {
+              updateBgInHash(e.target.value);
+              rerender((x) => x + 1);
+            }}
+          />
         </div>
+      </section>
+      <section className="share-btns">
+        <button className="share-btn">Copy Share URL</button>
+        <button className="share-btn twitter" aria-label="Tweet">
+          <Twitter />
+        </button>
       </section>
     </main>
   );
@@ -246,6 +252,32 @@ function getInfoFromHash(): Info {
       throw new Error("Invalid hash");
     }
     return info;
+  } catch (err) {
+    console.error(err);
+  }
+  return {
+    used: [],
+    bg: "",
+  };
+}
+
+function getInfoFromSearchParams(): Info {
+  if (typeof window === "undefined") return { used: [], bg: "" };
+  const params = new URLSearchParams(window.location.search);
+  const data = params.get("data");
+  if (!data)
+    return {
+      used: [],
+      bg: "",
+    };
+
+  try {
+    const info = msgpack.decode(Buffer.from(data, "base64"));
+    if (!Array.isArray(info.used)) {
+      throw new Error("Invalid hash");
+    } else {
+      return info;
+    }
   } catch (err) {
     console.error(err);
   }
