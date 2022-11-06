@@ -97,10 +97,10 @@ main {
 
 h1 {
   font-weight: 800;
-  font-size: 29px;
-  line-height: 30px;
+  font-size: 36px;
+  line-height: 38px;
   letter-spacing: -0.015em;
-  color: #2c2c2c;
+  color: var(--color-blue-dark);
   display: grid;
   justify-self: start;
 }
@@ -183,7 +183,7 @@ h2 {
   --w: 7300px;
   width: var(--w);
   min-width: var(--w);
-  padding-bottom: var(--hPaddingPage);
+  padding-bottom: 41px;
   padding-left: var(--hPaddingPage);
 }
 
@@ -335,10 +335,19 @@ section.words {
     position: relative;
     padding-top: 60px;
     gap: 20px;
+    border-right: solid 1px var(--color-blue-dark);
+  }
+
+  h1 {
+    color: var(--color-blue-dark);
+  }
+
+  header h3 {
+    margin-top: 20px;
   }
 
   header::after {
-    content: " ";
+    /* content: " "; */
     display: block;
     width: 100vw;
     height: 100%;
@@ -365,7 +374,7 @@ section.words {
     /* background-color: var(--color-blue-lighter); */
 
     /* Option 3 */
-    background-blend-mode: darken;
+    /* background-blend-mode: darken;
     background-color: #0000;
     background-image: repeating-linear-gradient(
         103deg,
@@ -384,7 +393,63 @@ section.words {
     background-size: 100% 100%;
     background-attachment: scroll, scroll;
     background-origin: padding-box, padding-box;
-    background-clip: border-box, border-box;
+    background-clip: border-box, border-box; */
+
+    /* Option 4 */
+    /* background-blend-mode: hard-light;
+    background-color: #0000;
+    background-image: linear-gradient(
+        193deg,
+        #a15af366,
+        #a15af366 8%,
+        #4aa744a8 89%
+      ),
+      repeating-linear-gradient(
+        103deg,
+        #d1d9ff66,
+        #d1d9ff66 1px,
+        #f3f5ff 1px 21px
+      ),
+      repeating-linear-gradient(
+        193deg,
+        #d1d9ff66,
+        #d1d9ff66 1px,
+        #f3f5ff 1px 21px
+      );
+    background-position: 0 0;
+    background-repeat: repeat, repeat, repeat;
+    background-size: 100% 100%;
+    background-attachment: scroll, scroll, scroll;
+    background-origin: padding-box, padding-box, padding-box;
+    background-clip: border-box, border-box, border-box; */
+
+    /* Option 5 */
+    /* background-blend-mode: darken;
+    background-color: #0000;
+    background-image: linear-gradient(
+        193deg,
+        #a15af366,
+        #a15af366 8%,
+        #4aa744a8 89%
+      ),
+      repeating-linear-gradient(
+        103deg,
+        #d1d9ff66,
+        #d1d9ff66 1px,
+        #f3f5ff 1px 10px
+      ),
+      repeating-linear-gradient(
+        193deg,
+        #d1d9ff66,
+        #d1d9ff66 1px,
+        #f3f5ff 1px 10px
+      );
+    background-position: 0 0;
+    background-repeat: repeat, repeat, repeat;
+    background-size: 100% 100%;
+    background-attachment: scroll, scroll, scroll;
+    background-origin: padding-box, padding-box, padding-box;
+    background-clip: border-box, border-box, border-box; */
   }
 
   .word-list__outer {
@@ -530,4 +595,10 @@ input[type="text"] {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Change highlight color */
+*::selection {
+  background-color: var(--color-blue-dark);
+  color: #ffffff;
 }

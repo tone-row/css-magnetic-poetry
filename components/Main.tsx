@@ -14,6 +14,7 @@ import { useRef, useState } from "react";
 
 import { Canvas } from "./Canvas";
 import { DownArrow } from "./DownArrow";
+import { Info } from "./types";
 import { Twitter } from "./Twitter";
 import { Word } from "./Word";
 import create from "zustand";
@@ -42,14 +43,26 @@ function Inner() {
   const unused = useCanvas((state) =>
     state.unused.filter((w) => !usedWords.includes(w.word))
   );
-
-  console.log(getInfoFromSearchParams());
+  const { urlWithoutHash, searchParams } = getUrlAndSearchParams(used, bg);
 
   return (
     <main className="page-main">
+      <section id="Instructions">
+        <p className="suggestion">
+          Instructions:
+          <br />
+          – Drag words onto the canvas to compose a poem exact
+          <br />
+          – Check out the preview image before sharing
+          <br />
+          – Share the link to your poem
+          <br />
+          – Enjoy!
+        </p>
+      </section>
       <section className="words">
         <p className="suggestion">Press and hold to see a word&apos;s origin</p>
-        <ScrollArea.Root asChild>
+        <ScrollArea.Root asChild type="always">
           <div
             className="word-list__outer"
             style={{
@@ -70,11 +83,18 @@ function Inner() {
                 bottom: 0,
                 left: 0,
                 width: "100%",
-                height: 10,
+                height: 20,
+                background: `repeating-linear-gradient(
+                  291deg,
+                  #d1d9ff,
+                  #d1d9ff 1px,
+                  #fff 1px 6px
+                )
+                0 0/100% 100%`,
               }}
             >
               <ScrollArea.Thumb
-                style={{ background: "darkgrey", height: 10 }}
+                style={{ background: "var(--color-blue-dark)", height: 20 }}
               />
             </ScrollArea.Scrollbar>
           </div>
@@ -105,13 +125,50 @@ function Inner() {
         </div>
       </section>
       <section className="share-btns">
-        <button className="share-btn">Copy Share URL</button>
+        <a
+          className="share-btn"
+          href={`${urlWithoutHash}/api/og?${searchParams.toString()}`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Preview
+        </a>
+        <button
+          className="share-btn"
+          onClick={() => {
+            // create new url
+            const newUrl = `${urlWithoutHash}?${searchParams.toString()}`;
+            // copy to clipboard
+            navigator.clipboard.writeText(newUrl);
+          }}
+        >
+          Copy Share URL
+        </button>
         <button className="share-btn twitter" aria-label="Tweet">
           <Twitter />
         </button>
       </section>
     </main>
   );
+}
+
+function getUrlAndSearchParams(
+  used: { word: string; top: string; left: string }[],
+  bg: string
+) {
+  if (typeof window === "undefined") {
+    return { urlWithoutHash: "", searchParams: new URLSearchParams() };
+  }
+  const hash = window.location.hash;
+  // get url
+  const url = window.location.href;
+  // remove hash
+  const urlWithoutHash = url.replace(hash, "");
+  const data = encodeURIComponent(JSON.stringify({ used, bg }));
+  // create search params from info
+  const searchParams = new URLSearchParams();
+  searchParams.set("data", data);
+  return { urlWithoutHash, searchParams };
 }
 
 export function Main() {
@@ -225,11 +282,6 @@ export function Main() {
     }
   }
 }
-
-type Info = {
-  used: { word: string; top: string; left: string }[];
-  bg: string;
-};
 
 function setInfoToHash(info: Info) {
   // encode info with hex
