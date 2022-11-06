@@ -96,6 +96,7 @@ main {
 h1 {
   font-weight: 800;
   font-size: 29px;
+  line-height: 30px;
   letter-spacing: -0.015em;
   color: #2c2c2c;
   display: grid;
@@ -236,17 +237,44 @@ section.words {
 }
 
 .share-btn {
-  padding: 11px 20px;
-  background-color: var(--color-blue-lighter);
-  line-height: 20px;
+  display: grid;
+  grid-auto-flow: column;
+  gap: 7px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 10px 9px;
+  border-radius: 2px;
+  background-color: #ffffff;
+  border: 1px solid #000000;
+  box-shadow: 0px 2px 1px rgba(0, 0, 0, 0.19);
+  font-weight: 400;
+  font-size: 20px;
+  color: #000000;
+  transform: scale(1) rotate(0deg);
+  transform-origin: center;
+}
+
+.share-btn path {
+  fill: black;
+  stroke: black;
+}
+
+.share-btn:hover {
+  color: var(--color-blue-dark);
+  fill: var(--color-blue-dark);
+  border-color: var(--color-blue-dark);
+  box-shadow: 0px 2px 2px rgba(var(--color-blue-dark-rgb), 0.25);
+  transform: scale(1.05) rotate(3deg);
+}
+
+.share-btn:hover path {
+  fill: var(--color-blue-dark);
+  stroke: var(--color-blue-dark);
 }
 
 .share-btn.twitter {
   padding: 11px;
-}
-
-.share-btn:hover {
-  background-color: var(--color-blue-light);
+  place-content: center;
 }
 
 .squigglies {
@@ -300,6 +328,7 @@ section.words {
     top: 0;
     right: 0;
     z-index: -2;
+    /* Option 1*/
     /* background-image: linear-gradient(
       240deg,
       hsl(230deg 100% 98%) 0%,
@@ -313,7 +342,31 @@ section.words {
       hsl(230deg 100% 92%) 89%,
       hsl(230deg 100% 91%) 100%
     ); */
-    background-color: var(--color-blue-lighter);
+
+    /* Option 2 */
+    /* background-color: var(--color-blue-lighter); */
+
+    /* Option 3 */
+    background-blend-mode: darken;
+    background-color: #0000;
+    background-image: repeating-linear-gradient(
+        103deg,
+        #d1d9ff66,
+        #d1d9ff66 1px,
+        #f3f5ff 1px 21px
+      ),
+      repeating-linear-gradient(
+        193deg,
+        #d1d9ff66,
+        #d1d9ff66 1px,
+        #f3f5ff 1px 21px
+      );
+    background-position: 0 0;
+    background-repeat: repeat, repeat;
+    background-size: 100% 100%;
+    background-attachment: scroll, scroll;
+    background-origin: padding-box, padding-box;
+    background-clip: border-box, border-box;
   }
 
   .word-list__outer {
