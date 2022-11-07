@@ -13,6 +13,7 @@ import { useRef, useState } from "react";
 
 import { Canvas } from "./Canvas";
 import { DownArrow } from "./DownArrow";
+import Head from "next/head";
 import { Info } from "./types";
 import { Twitter } from "./Twitter";
 import { Word } from "./Word";
@@ -37,7 +38,6 @@ const TIMEOUT_BEFORE_MODAL = 1000;
 function Inner() {
   const { used, bg } = getInfoFromHash();
   const usedWords = used.map((word) => word.word);
-  const [_, rerender] = useState(0);
   const unused = useCanvas((state) =>
     state.unused.filter((w) => !usedWords.includes(w.word))
   );
@@ -52,120 +52,129 @@ function Inner() {
   }
 
   return (
-    <main className="page-main">
-      <section id="Instructions">
-        <p className="suggestion">
-          Instructions:
-          <br />
-          – Drag words onto the canvas to compose a poem
-          <br />
-          – Check out the preview image before sharing
-          <br />
-          – Share a link to your poem
-          <br />
-          – Enjoy!
-        </p>
-      </section>
-      <section className="words">
-        <p className="suggestion">Press and hold to see a word&apos;s origin</p>
-        <ScrollArea.Root asChild type="always">
-          <div className="word-list__outer">
-            <ScrollArea.Viewport>
-              <div className="word-list__inner">
-                {unused.map((word) => (
-                  <Word word={word.word} used={false} key={word.word} />
-                ))}
-              </div>
-            </ScrollArea.Viewport>
-            <ScrollArea.Scrollbar
-              orientation="horizontal"
-              style={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                width: "100%",
-                height: 20,
-                background: `repeating-linear-gradient(
+    <>
+      <Head>
+        <meta property="og:title" content="My page title" key="title" />
+      </Head>
+      <main className="page-main">
+        <section id="Instructions">
+          <p className="suggestion">
+            Instructions:
+            <br />
+            – Drag words onto the canvas to compose a poem
+            <br />
+            – Check out the preview image before sharing
+            <br />
+            – Share a link to your poem
+            <br />
+            – Enjoy!
+          </p>
+        </section>
+        <section className="words">
+          <p className="suggestion">
+            Press and hold to see a word&apos;s origin
+          </p>
+          <ScrollArea.Root asChild type="always">
+            <div className="word-list__outer">
+              <ScrollArea.Viewport>
+                <div className="word-list__inner">
+                  {unused.map((word) => (
+                    <Word word={word.word} used={false} key={word.word} />
+                  ))}
+                </div>
+              </ScrollArea.Viewport>
+              <ScrollArea.Scrollbar
+                orientation="horizontal"
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  width: "100%",
+                  height: 20,
+                  background: `repeating-linear-gradient(
                   291deg,
                   #d1d9ff,
                   #d1d9ff 1px,
                   #fff 1px 6px
                 )
                 0 0/100% 100%`,
-              }}
-            >
-              <ScrollArea.Thumb
-                style={{ background: "var(--color-blue-dark)", height: 20 }}
-              />
-            </ScrollArea.Scrollbar>
-          </div>
-        </ScrollArea.Root>
-        {/* <p className="suggestion scroll">Scroll &rarr;</p> */}
-      </section>
-      <section className="canvas">
-        <p className="suggestion drag-words">
-          <DownArrow />
-          <span>drag words onto the canvas to compose poem</span>
-        </p>
-        <Canvas style={{ background: bg }}>
-          {used.map(({ word, top, left }) => (
-            <Word key={word} word={word} used={true} style={{ top, left }} />
-          ))}
-        </Canvas>
-        <div className="canvas-controls">
-          <label htmlFor="background">Background</label>
-          <input
-            type="text"
-            id="background"
-            autoCapitalize="off"
-            defaultValue={bg}
-            onChange={(e) => {
-              updateBgInHash(e.target.value);
-              useCanvas.setState((state) => ({
-                ...state,
-                trigger: state.trigger + 1,
-              }));
-            }}
-          />
-          <a className="clear-btn" href="/">
-            Clear Canvas
-          </a>
-        </div>
-      </section>
-      {warnings.length > 0 && (
-        <section>
-          {warnings.map((warning) => (
-            <p className="suggestion warning" key={warning}>
-              {warning}
-            </p>
-          ))}
+                }}
+              >
+                <ScrollArea.Thumb
+                  style={{ background: "var(--color-blue-dark)", height: 20 }}
+                />
+              </ScrollArea.Scrollbar>
+            </div>
+          </ScrollArea.Root>
+          {/* <p className="suggestion scroll">Scroll &rarr;</p> */}
         </section>
-      )}
-      <section className="share-btns">
-        <a
-          className="share-btn"
-          href={`${urlWithoutHash}/api/og?${searchParams.toString()}`}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Preview
-        </a>
-        <button
-          className="share-btn"
-          onClick={() => {
-            // create new url
-            const newUrl = `${urlWithoutHash}?${searchParams.toString()}`;
-            // copy to clipboard
-            navigator.clipboard.writeText(newUrl);
-          }}
-        >
-          Copy Share URL
-        </button>
-        <button className="share-btn twitter" aria-label="Tweet">
-          <Twitter />
-        </button>
-      </section>
-    </main>
+        <section className="canvas">
+          <p className="suggestion drag-words">
+            <DownArrow />
+            <span>drag words onto the canvas to compose poem</span>
+          </p>
+          <Canvas style={{ background: bg }}>
+            {used.map(({ word, top, left }) => (
+              <Word key={word} word={word} used={true} style={{ top, left }} />
+            ))}
+          </Canvas>
+          <div className="canvas-controls">
+            <label htmlFor="background">Background</label>
+            <input
+              type="text"
+              id="background"
+              autoCapitalize="off"
+              defaultValue={bg}
+              onChange={(e) => {
+                updateBgInHash(e.target.value);
+                useCanvas.setState((state) => ({
+                  ...state,
+                  trigger: state.trigger + 1,
+                }));
+              }}
+            />
+            <a className="clear-btn" href="/">
+              Clear Canvas
+            </a>
+          </div>
+        </section>
+        {warnings.length > 0 && (
+          <section>
+            {warnings.map((warning) => (
+              <p className="suggestion warning" key={warning}>
+                {warning}
+              </p>
+            ))}
+          </section>
+        )}
+        <section className="share-btns">
+          <a
+            className="share-btn"
+            href={`${urlWithoutHash}/api/og?${searchParams.toString()}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Preview
+          </a>
+          <button
+            className="share-btn"
+            onClick={() => {
+              // get hash
+              const hash = window.location.hash.slice(1);
+              // create new url
+              const newUrl = `${urlWithoutHash}/${hash}`;
+              // copy to clipboard
+              navigator.clipboard.writeText(newUrl);
+            }}
+          >
+            Copy Share URL
+          </button>
+          <button className="share-btn twitter" aria-label="Tweet">
+            <Twitter />
+          </button>
+        </section>
+      </main>
+    </>
   );
 }
 

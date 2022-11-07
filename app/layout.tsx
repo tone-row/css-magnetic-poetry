@@ -2,6 +2,7 @@ import "../styles/style.css";
 
 export default function RootLayout({
   children,
+  ...rest
 }: {
   children: React.ReactNode;
 }) {
