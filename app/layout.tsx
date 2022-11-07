@@ -1,5 +1,7 @@
 import "../styles/style.css";
 
+import seo from "../seo.json";
+
 export default function RootLayout({
   children,
 }: {
@@ -10,7 +12,8 @@ export default function RootLayout({
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width" />
-        <title>CSS Magnetic Poetry</title>
+        <title>{seo.title}</title>
+        <meta name="description" content={seo.description} />
         <link
           rel="apple-touch-icon"
           sizes="180x180"
