@@ -2,18 +2,12 @@
 
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 
-import {
-  Dialog,
-  DialogDismiss,
-  DialogHeading,
-  useDialogState,
-} from "ariakit/dialog";
+import { Dialog, DialogDismiss, useDialogState } from "ariakit/dialog";
 import {
   DndContext,
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
-  useDndContext,
 } from "@dnd-kit/core";
 import { useRef, useState } from "react";
 
@@ -31,25 +25,31 @@ import { words } from "./words";
 const useCanvas = create<{
   unused: typeof words;
   active: { word: string; used: boolean } | null;
+  trigger: number;
 }>(() => ({
   unused: words,
   active: null,
+  trigger: 0,
 }));
 
 const TIMEOUT_BEFORE_MODAL = 1000;
 
 function Inner() {
-  const { active } = useDndContext();
-  const a = useCanvas((s) => s.active);
-  console.log(a);
-  // const isDragging = active !== null;
   const { used, bg } = getInfoFromHash();
   const usedWords = used.map((word) => word.word);
   const [_, rerender] = useState(0);
   const unused = useCanvas((state) =>
     state.unused.filter((w) => !usedWords.includes(w.word))
   );
+  const _trigger = useCanvas((state) => state.trigger);
   const { urlWithoutHash, searchParams } = getUrlAndSearchParams(used, bg);
+
+  let warnings = [];
+  if (bg.includes("radial-gradient")) {
+    warnings.push(
+      `Radial gradients only work with the shape and location, e.g. "circle at 40% 50"`
+    );
+  }
 
   return (
     <main className="page-main">
@@ -112,19 +112,35 @@ function Inner() {
             <Word key={word} word={word} used={true} style={{ top, left }} />
           ))}
         </Canvas>
-        <div className="input-with-label">
+        <div className="canvas-controls">
           <label htmlFor="background">Background</label>
           <input
             type="text"
             id="background"
+            autoCapitalize="off"
             defaultValue={bg}
-            onBlur={(e) => {
+            onChange={(e) => {
               updateBgInHash(e.target.value);
-              rerender((x) => x + 1);
+              useCanvas.setState((state) => ({
+                ...state,
+                trigger: state.trigger + 1,
+              }));
             }}
           />
+          <a className="clear-btn" href="/">
+            Clear Canvas
+          </a>
         </div>
       </section>
+      {warnings.length > 0 && (
+        <section>
+          {warnings.map((warning) => (
+            <p className="suggestion warning" key={warning}>
+              {warning}
+            </p>
+          ))}
+        </section>
+      )}
       <section className="share-btns">
         <a
           className="share-btn"
@@ -279,10 +295,12 @@ export function Main() {
 
     // word not dropped on canvas
     if (event.over === null) {
-      console.log("HI");
       if (used) {
         // remove word from url bar
         removeWordFromHash(word);
+        useCanvas.setState((state) => ({
+          trigger: Math.random(),
+        }));
       }
       return;
     }
@@ -307,6 +325,10 @@ export function Main() {
       addWordToHash(word, top, left);
       // you might need to set active null
     }
+
+    useCanvas.setState((state) => ({
+      trigger: Math.random(),
+    }));
   }
 }
 
@@ -369,6 +391,10 @@ function updateWordInHash(word: string, top: string, left: string) {
     return w;
   });
   setInfoToHash(info);
+  // trigger render
+  useCanvas.setState((state) => ({
+    active: null,
+  }));
 }
 
 function updateBgInHash(bg: string) {

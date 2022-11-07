@@ -1,12 +1,22 @@
+import Head from "next/head";
 import { Main } from "../components/Main";
 import { Smiley } from "../components/Smiley";
 export default function Page({
   searchParams,
 }: {
-  searchParams: { data: string };
+  searchParams: { data?: string };
 }) {
+  const data = searchParams?.data;
   return (
     <div className="container">
+      {data && (
+        <Head>
+          <meta
+            property="og:image"
+            content={`https://css-magnetic-poetry.tone-row.com/api/og?data=${data}`}
+          />
+        </Head>
+      )}
       <header className="page-header">
         <h1>
           <span>CSS</span> <span>Magnetic</span> <span>Poetry</span>

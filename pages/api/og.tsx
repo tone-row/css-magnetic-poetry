@@ -39,7 +39,7 @@ export default async function OG(req: NextRequest) {
           fontSize: 128,
           width: "100%",
           height: "100%",
-          ...expandedBgProperties,
+          ...bgProps,
         }}
       >
         {words.map((word) => (
@@ -54,7 +54,6 @@ export default async function OG(req: NextRequest) {
               fontFamily: "Georgia",
               fontSize: 18 * 2,
               lineHeight: 20 / 18,
-              // fontSmooth: "always",
               backgroundColor: "white",
               paddingTop: 5 * 2,
               paddingBottom: 6 * 2,

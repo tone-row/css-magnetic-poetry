@@ -132,6 +132,14 @@ header h2 {
   color: #747474;
 }
 
+.suggestion.warning {
+  background-color: #ffefef;
+  border: 1px solid #ff0000;
+  color: #ff0000;
+  padding: 10px;
+  border-radius: 5px;
+}
+
 .scroll {
   position: absolute;
   bottom: -5px;
@@ -565,11 +573,10 @@ section.words {
   overflow: hidden;
 }
 
-.input-with-label {
+.canvas-controls {
   display: grid;
   gap: 5px;
-  grid-auto-flow: column;
-  justify-content: start;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   font-size: 80%;
   line-height: 1;
@@ -632,4 +639,21 @@ input[type="text"] {
 .dialog-heading {
   display: grid;
   gap: 10px;
+}
+
+/* button to clear the drawing */
+.clear-btn {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 5px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.clear-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.clear-btn:active {
+  background-color: rgba(0, 0, 0, 0.2);
 }
