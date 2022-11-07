@@ -72,7 +72,7 @@ function Inner() {
                 </Link>
               );
               if (i < examples.length - 1) {
-                arr.push(", ");
+                arr.push(<>{", "}</>);
               }
               return arr;
             }, [] as JSX.Element[])}
