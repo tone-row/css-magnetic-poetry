@@ -15,9 +15,11 @@ import { Canvas } from "./Canvas";
 import { DownArrow } from "./DownArrow";
 import Head from "next/head";
 import { Info } from "./types";
+import Link from "next/link";
 import { Twitter } from "./Twitter";
 import { Word } from "./Word";
 import create from "zustand";
+import { examples } from "./examples";
 import msgpack from "msgpack-lite";
 // shuffle words
 import { words } from "./words";
@@ -62,8 +64,20 @@ function Inner() {
             Instructions:
             <br />
             – Drag words onto the canvas to compose a poem
+            <br />– Check out some examples:{" "}
+            {examples.reduce((arr, url, i) => {
+              arr.push(
+                <Link href={url} key={i}>
+                  {i + 1}
+                </Link>
+              );
+              if (i < examples.length - 1) {
+                arr.push(", ");
+              }
+              return arr;
+            }, [] as JSX.Element[])}
             <br />
-            – Check out the preview image before sharing
+            – View preview before sharing
             <br />
             – Share a link to your poem
             <br />
@@ -168,9 +182,6 @@ function Inner() {
             }}
           >
             Copy Share URL
-          </button>
-          <button className="share-btn twitter" aria-label="Tweet">
-            <Twitter />
           </button>
         </section>
       </main>

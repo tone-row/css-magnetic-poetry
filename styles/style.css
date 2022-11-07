@@ -657,3 +657,7 @@ input[type="text"] {
 .clear-btn:active {
   background-color: rgba(0, 0, 0, 0.2);
 }
+
+#Instructions .suggestion a {
+  color: var(--color-blue-dark);
+}
