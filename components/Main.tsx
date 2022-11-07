@@ -67,7 +67,16 @@ function Inner() {
             <br />– Check out some examples:{" "}
             {examples.reduce((arr, url, i) => {
               arr.push(
-                <Link href={url} key={i}>
+                <Link
+                  href={url}
+                  key={i}
+                  onClick={() => {
+                    // defer a render
+                    setTimeout(() => {
+                      useCanvas.setState({ trigger: _trigger + 1 });
+                    }, 0);
+                  }}
+                >
                   {i + 1}
                 </Link>
               );
