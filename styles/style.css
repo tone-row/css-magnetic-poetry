@@ -658,6 +658,7 @@ input[type="text"] {
   background-color: rgba(0, 0, 0, 0.2);
 }
 
-#Instructions .suggestion a {
+#Instructions .suggestion a,
+#Instructions .suggestion button {
   color: var(--color-blue-dark);
 }
