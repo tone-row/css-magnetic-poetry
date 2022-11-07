@@ -162,7 +162,7 @@ function Inner() {
               // get hash
               const hash = window.location.hash.slice(1);
               // create new url
-              const newUrl = `${urlWithoutHash}/${hash}`;
+              const newUrl = `${urlWithoutHash}${hash}`;
               // copy to clipboard
               navigator.clipboard.writeText(newUrl);
             }}
