@@ -21,7 +21,9 @@ export default async function OG(req: NextRequest) {
   const words = info.used ?? [];
   const fontData = await font;
 
-  const expandedBgProperties = expand("background", info.bg ?? "whitesmoke");
+  const expandedBgProperties = info.bg.includes("gradient")
+    ? { backgroundImage: info.bg }
+    : expand("background", info.bg ?? "whitesmoke") ?? {};
   // convert kebab case to camel case
   let bgProps: Record<string, string> = {};
   for (const [key, value] of Object.entries(expandedBgProperties)) {

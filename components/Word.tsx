@@ -1,4 +1,4 @@
-import { UniqueIdentifier, useDraggable } from "@dnd-kit/core";
+import { useDraggable } from "@dnd-kit/core";
 
 export function Word({
   word,

@@ -2,7 +2,12 @@
 
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 
-import { Dialog, DialogDismiss, useDialogState } from "ariakit/dialog";
+import {
+  Dialog,
+  DialogDismiss,
+  DialogHeading,
+  useDialogState,
+} from "ariakit/dialog";
 import {
   DndContext,
   DragEndEvent,
@@ -35,8 +40,9 @@ const TIMEOUT_BEFORE_MODAL = 1000;
 
 function Inner() {
   const { active } = useDndContext();
-  const isDragging = active !== null;
-  // const used = useCanvas((state) => state.used);
+  const a = useCanvas((s) => s.active);
+  console.log(a);
+  // const isDragging = active !== null;
   const { used, bg } = getInfoFromHash();
   const usedWords = used.map((word) => word.word);
   const [_, rerender] = useState(0);
@@ -51,11 +57,11 @@ function Inner() {
         <p className="suggestion">
           Instructions:
           <br />
-          – Drag words onto the canvas to compose a poem exact
+          – Drag words onto the canvas to compose a poem
           <br />
           – Check out the preview image before sharing
           <br />
-          – Share the link to your poem
+          – Share a link to your poem
           <br />
           – Enjoy!
         </p>
@@ -63,12 +69,7 @@ function Inner() {
       <section className="words">
         <p className="suggestion">Press and hold to see a word&apos;s origin</p>
         <ScrollArea.Root asChild type="always">
-          <div
-            className="word-list__outer"
-            style={{
-              overflow: isDragging ? "hidden" : "auto",
-            }}
-          >
+          <div className="word-list__outer">
             <ScrollArea.Viewport>
               <div className="word-list__inner">
                 {unused.map((word) => (
@@ -108,7 +109,7 @@ function Inner() {
         </p>
         <Canvas style={{ background: bg }}>
           {used.map(({ word, top, left }) => (
-            <Word word={word} used={true} key={word} style={{ top, left }} />
+            <Word key={word} word={word} used={true} style={{ top, left }} />
           ))}
         </Canvas>
         <div className="input-with-label">
@@ -176,6 +177,16 @@ export function Main() {
   const modalTimeout = useRef<number | null>(null);
   const dialog = useDialogState();
   const [word, setWord] = useState<typeof words[number] | null>(null);
+  const sources = word?.sources ?? [];
+  let uniqueSources: {
+    title: string;
+    url: string;
+  }[] = [];
+  for (const source of sources) {
+    if (!uniqueSources.find((s) => s.url === source.url)) {
+      uniqueSources.push(source);
+    }
+  }
   return (
     <>
       <DndContext
@@ -189,15 +200,18 @@ export function Main() {
         </DragOverlay>
       </DndContext>
       <Dialog state={dialog} aria-label="Word Info" className="word-info">
-        <h2>
-          Why{" "}
-          <span style={{ fontWeight: 800 }}>&ldquo;{word?.word}&rdquo;</span>?
-        </h2>
-        <p className="suggestion">
-          {word?.word} can be found in {word?.sources.length} properties.
-        </p>
+        <div className="dialog-heading">
+          <h2>
+            <span style={{ fontWeight: 800, color: "var(--color-blue-dark)" }}>
+              {word?.word}
+            </span>
+          </h2>
+          <p className="suggestion">
+            {word?.word} can be found in {uniqueSources.length} properties.
+          </p>
+        </div>
         <div className="sources-list">
-          {word?.sources.map((source, i) => (
+          {uniqueSources.map((source, i) => (
             <p key={i}>
               <a href={source.url}>
                 <span className="source-title">{source.title}</span>
@@ -214,17 +228,24 @@ export function Main() {
   function handleDragStart(event: DragStartEvent) {
     const wordInfo = words.find((w) => w.word === event.active.id);
 
-    if (wordInfo) {
-      // set modal timeout
-      modalTimeout.current = window.setTimeout(() => {
-        // release word
-        useCanvas.setState((state) => ({
-          active: null,
-        }));
-        setWord(wordInfo);
-        dialog.show();
-      }, TIMEOUT_BEFORE_MODAL);
-    }
+    // temporarily lock scroll on body with class
+    document.body.classList.add("scroll-lock");
+    // disable touchmove events on body
+    document.body.addEventListener("touchmove", preventDefault, {
+      passive: false,
+    });
+
+    if (!wordInfo) return;
+
+    // set modal timeout
+    modalTimeout.current = window.setTimeout(() => {
+      // release word
+      useCanvas.setState((state) => ({
+        active: null,
+      }));
+      setWord(wordInfo);
+      dialog.show();
+    }, TIMEOUT_BEFORE_MODAL);
 
     useCanvas.setState({
       active: {
@@ -243,6 +264,11 @@ export function Main() {
   }
 
   function handleDragEnd(event: DragEndEvent) {
+    // remove scroll lock
+    document.body.classList.remove("scroll-lock");
+    // re-enable touchmove events on body
+    document.body.removeEventListener("touchmove", preventDefault);
+
     if (modalTimeout.current) {
       window.clearTimeout(modalTimeout.current);
       modalTimeout.current = null;
@@ -253,6 +279,7 @@ export function Main() {
 
     // word not dropped on canvas
     if (event.over === null) {
+      console.log("HI");
       if (used) {
         // remove word from url bar
         removeWordFromHash(word);
@@ -283,6 +310,10 @@ export function Main() {
   }
 }
 
+function preventDefault(e: Event) {
+  e.preventDefault();
+}
+
 function setInfoToHash(info: Info) {
   // encode info with hex
   const hash = Buffer.from(msgpack.encode(info)).toString("base64");
@@ -304,32 +335,6 @@ function getInfoFromHash(): Info {
       throw new Error("Invalid hash");
     }
     return info;
-  } catch (err) {
-    console.error(err);
-  }
-  return {
-    used: [],
-    bg: "",
-  };
-}
-
-function getInfoFromSearchParams(): Info {
-  if (typeof window === "undefined") return { used: [], bg: "" };
-  const params = new URLSearchParams(window.location.search);
-  const data = params.get("data");
-  if (!data)
-    return {
-      used: [],
-      bg: "",
-    };
-
-  try {
-    const info = msgpack.decode(Buffer.from(data, "base64"));
-    if (!Array.isArray(info.used)) {
-      throw new Error("Invalid hash");
-    } else {
-      return info;
-    }
   } catch (err) {
     console.error(err);
   }

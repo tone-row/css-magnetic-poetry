@@ -51,6 +51,16 @@ body {
   min-height: 100vh;
 }
 
+body.scroll-lock,
+body.scroll-lock .page,
+body.scroll-lock .page > div {
+  overflow: hidden;
+  -webkit-touch-callout: "none";
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none;
+}
+
 strong {
   font-weight: 800;
 }
@@ -105,7 +115,7 @@ h1 {
   justify-self: start;
 }
 
-h2 {
+header h2 {
   font-size: 20px;
   line-height: 24px;
   letter-spacing: -0.015em;
@@ -139,19 +149,23 @@ h2 {
   font-size: calc(var(--fs));
   line-height: calc(var(--lh));
   font-family: Georgia, "Times New Roman", Times, serif;
-  background: #ffffff;
-  border: 1px solid #000000;
-  border-radius: 2px;
-  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.3);
+
   font-weight: 400;
   color: #000000;
   cursor: grab;
+  user-select: none;
 }
 
-.drag-overlay .word {
+.drag-overlay {
+  /* prevent highlighting */
+  user-select: none;
+}
+
+.drag-overlay button {
   transform: scale(1) rotate(0deg);
   box-shadow: 0px 3px 1px rgba(0, 0, 0, 0.19);
   animation: liftAndTwist 0.1s linear forwards;
+  border: solid 1px black;
   cursor: grabbing;
 }
 
@@ -187,11 +201,20 @@ h2 {
   padding-left: var(--hPaddingPage);
 }
 
-.word-list__inner .word:hover {
+.word-list__inner button,
+.drag-overlay button,
+.canvas__canvas button {
+  background: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 2px;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.word-list__inner button:hover {
   box-shadow: 0px 1px 1px 0.5px rgba(0, 0, 0, 0.3);
 }
 
-.word-list__inner [aria-pressed="true"] .word {
+.word-list__inner [aria-pressed="true"] {
   opacity: 0.25;
   border-style: dashed;
   box-shadow: none;
@@ -212,10 +235,10 @@ h2 {
 
 .canvas__canvas button {
   position: absolute;
-}
-
-.canvas__canvas .word {
   box-shadow: 1px 1px 0px 0px black;
+}
+.canvas__canvas button[aria-pressed="true"] {
+  opacity: 0;
 }
 
 .page-main {
@@ -513,15 +536,18 @@ section.words {
 
 .word-info .sources-list {
   display: grid;
-  gap: 15px;
+  gap: 5px;
 }
 
 .word-info .sources-list a {
   display: grid;
+  padding: 5px;
+  margin-left: -5px;
 }
 
 .word-info .sources-list a:hover {
-  color: var(--color-blue-dark);
+  background-color: #f3f5ff;
+  outline: 1px solid #d1d9ff;
 }
 
 .word-info .source-title {
@@ -558,7 +584,7 @@ input[type="text"] {
   padding: 5px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 4px;
-  font-size: 100%;
+  font-size: 16px;
   width: 100%;
 }
 
@@ -601,4 +627,9 @@ input[type="text"] {
 *::selection {
   background-color: var(--color-blue-dark);
   color: #ffffff;
+}
+
+.dialog-heading {
+  display: grid;
+  gap: 10px;
 }
