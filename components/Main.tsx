@@ -145,7 +145,7 @@ function Inner() {
               type="text"
               id="background"
               autoCapitalize="off"
-              defaultValue={bg}
+              value={bg}
               onChange={(e) => {
                 updateBgInHash(e.target.value);
                 useCanvas.setState((state) => ({
