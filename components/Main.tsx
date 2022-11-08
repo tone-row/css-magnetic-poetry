@@ -236,6 +236,7 @@ export function Main() {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragMove={handleDragMove}
+        autoScroll={false}
       >
         <Inner />
         <DragOverlay className="drag-overlay">
